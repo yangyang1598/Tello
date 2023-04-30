@@ -36,21 +36,23 @@ def thresholding(img):
     mask = cv2.inRange(hsv, lower, upper)# inRange함수를 통해 사용하고자 하는 색상 영역의 값만 처리한 이미지를 mask로 정의합니다.
     return mask #위의 과정으로 생성한 이미지를 반환합니다.
 
-#아래의 함수는 위 Thresholding 함수를 통해 색상 필터링한 이미지에서 이미지의 특징을 추출하기 위해 외곽선을 검출하는 함수입니다.
-# findContours 함수는 (이미지,검출모드,외곽선 근사화 방법..) 변수를 기입한 경우 검출한 외곽선의 좌표와 외곽선 인덱스를 반환합니다.
+#아래의 함수는 위 Thresholding 함수를 통해 색상 필터링한 이미지에서 이미지의 특징을 추출하기 위해 외곽선을 검출하는 함수입니다.을 표시한다. 이때 별도의 선언없이 기입한 이미지에 자동적으로 내용이 적용됩니다.
+# findContours 함수는 (이미지,검출모드,외곽선 근사화 방법,...) 변수를 기입한 경우 검출한 외곽선의 좌표와 외곽선 계층을 반환합니다. 이때 외곽선의 계층이란 다중객체(ex.원 안 사각형)가 있는 경우 가장 외부의 도형을 부모,내부의 도형을 자식과 같이 분류하여 순위를 숫자로 매겨 표현합니다.
+#drawContours 함수는 (이미지,좌표,외곽선인덱스,색상,굵기,선 타입) 변수를 기입한 경우 해당 좌표에 지정한 방식에 따라 외곽선을 표시한다. 이때 별도의 선언없이 기입한 이미지에 자동적으로 내용이 적용되며 외곽선인덱스의 경우 -1인 경우 모든 외곽선 표시를, 두께의 경우 <0 인 경우 내부 채우기를 의미합니다.
+#boundingRect 함수는 도형을 변수로 기입하였을 때 해당 도형에 외접하는 사각형의 좌표값을 반환합니다. 사각형을 그리고자하는 경우 cv2.rectangle함수를 이용하여야합니다.
 
 def getContours(imgThres, img):
     cx = 0
     cy = 0
-    contours, hierarchy = cv2.findContours(imgThres, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    if len(contours) != 0:
-        biggest = max(contours, key=cv2.contourArea)
-        x, y, w, h = cv2.boundingRect(biggest)
-        cx = x + w // 2
-        cy = y + h // 2
-        cv2.drawContours(img, contours, -1, (255, 0, 255), 7)
-        cv2.circle(img, (cx, cy), 10, (0, 255, 0), cv2.FILLED)
-    return cx, cy
+    contours, hierarchy = cv2.findContours(imgThres, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)  #함수를 통해 필요한 영역 부분에 대한 외곽선의 좌표와 인덱스 값을 반환받습니다.
+    if len(contours) != 0: #외곽선을 표시할 영역이 존재하는 경우
+        biggest = max(contours, key=cv2.contourArea)# 가장 외부의 도형을 biggest 변수로 선언하여 값을 저장합니다.
+        x, y, w, h = cv2.boundingRect(biggest) #함수를 통해 좌표값을 반환받습니다. 이때 xy는 사각형의 좌상단의 좌표값이며 w,h는 너비와 높이를 의미합니다.
+        cx = x + w // 2 # 원의 중심좌표값은 x에서 너비의 반만큼 이동한 값이므로 x＋w/2로 선업합니다
+        cy = y + h // 2 #원의 반지름값은 y에서 높이의 반만큼 이동한 값이므로 y＋h/2값으로 선언합니다.
+        cv2.drawContours(img, contours, -1, (255, 0, 255), 7)#함수를 사용하여 검출하고자하는 내용에 적합한 외곽선을 그립니다.
+        cv2.circle(img, (cx, cy), 10, (0, 255, 0), cv2.FILLED) #계산한 cx,cy값을 적용하여 원을 그립니다.
+    return cx, cy #계산한 cx,cy값을 반환합니다.
 
 
 def getSensorOutput(imgThres, sensors):
