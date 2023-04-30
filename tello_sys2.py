@@ -22,15 +22,19 @@ threshold = 0.2 # threshold 값은 0.2로 선언합니다.
 width, height = 480, 360 # 제어하고자하는 이미지의 해상도(pixel 크기) 너비와 높이 값을 각각 정의합니다.
 senstivity = 3 # 이미지의 민감도를 설정하기 위해 변수를 선언하고 값은 3으로 설정합니다.
 weights = [-25, -15, 0, 15, 25] #이미지를 처리하기 위한 가중치 값을 담은 배열을 선언합니다.
-curve = 0
-fSpeed = 0
+curve = 0 # 색상 값에 따라 회전 시의 회전 정도(커브 값)에 대한 변수를 선언합니다
+fSpeed = 0 #드론의 속도 변수를 선언합니다.
+
+#아래의 함수는 색상값을 변별(구별)하기 위한 절차를 담당합니다.
+#cvtColor 함수는 현재 받아오는 색상값형태를 다른 형태로 바꿀 때 사용하는 함수로 BGR,hsv,gray,yCrab간의 변환이 가능하다.
+#inRange함수의 경우 색상필터를 생성하는 함수로 (이미지, 최소값, 최대값)의 변수를 기입한 경우 해당 이미지에서 최소값과 최대값 영역내의 값으로 필터를 생성한다.
 
 def thresholding(img):
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    lower = np.array([hsvVals[0], hsvVals[1], hsvVals[2]])
-    upper = np.array([hsvVals[3], hsvVals[4], hsvVals[5]])
-    mask = cv2.inRange(hsv, lower, upper)
-    return mask
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV) # RGB로 받아온 값을 HSV로 변환합니다
+    lower = np.array([hsvVals[0], hsvVals[1], hsvVals[2]]) #위의 정의한 색상 값 중 min값들을 배열 lower에 정의합니다.
+    upper = np.array([hsvVals[3], hsvVals[4], hsvVals[5]]) # 위의 정의한 색상 값 중에 max값들을 배열 upper에 정의합니다.
+    mask = cv2.inRange(hsv, lower, upper)# inRange함수를 통해 사용하고자 하는 색상 영역의 값만 처리한 이미지를 mask로 정의합니다.
+    return mask #위의 과정으로 생성한 필터를 반환합니다.
 
 
 def getContours(imgThres, img):
